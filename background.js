@@ -153,8 +153,8 @@ const apiHandlers = {
                 },
                 body: JSON.stringify(requestBody)
             });
-
             const data = await response.json();
+            console.log('API Response:', data.success);
             if (data.success && data.result && data.result.response) {
                 return data.result.response;
             } else {

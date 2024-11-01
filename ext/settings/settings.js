@@ -23,8 +23,15 @@ function populateModelDropdown(platform) {
             option.textContent = model;
             modelSelect.appendChild(option);
         });
-        modelSelect.disabled = useSpecificModel.checked;
-        customModelInput.disabled = !useSpecificModel.checked;
+        
+        if (platform === 'Gemini') {
+            modelSelect.disabled = useSpecificModel.checked;
+            customModelInput.disabled = !useSpecificModel.checked;
+        } else {
+            modelSelect.disabled = true;
+            customModelInput.disabled = false;
+            useSpecificModel.checked = true;
+        }
     } else {
         modelSelect.disabled = true;
         customModelInput.disabled = false;
@@ -118,7 +125,7 @@ async function testGeminiAPI() {
     }
 
     try {
-        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=' + apiKey, {
+        const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -156,7 +163,7 @@ async function testOpenRouterAPI() {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${apiKey}`,
-                'HTTP-Referer': 'https://github.com/johnle/chromium-intelligence',
+                'HTTP-Referer': 'https://github.com/9-5/chromium-intelligence',
                 'X-Title': 'Chromium Intelligence'
             },
             body: JSON.stringify({
@@ -212,6 +219,18 @@ async function testCloudflareAPI() {
     }
 }
 
+function setModelValue(savedModel) {
+    const modelSelect = document.getElementById('model');
+    if (savedModel && Array.from(modelSelect.options).some(option => option.value === savedModel)) {
+        modelSelect.value = savedModel;
+        console.log('Setting model to saved value:', savedModel);
+    } else {
+        console.log('Saved model not found in options, defaulting to first option');
+        modelSelect.selectedIndex = 0;
+    }
+}
+
+
 function loadSettings() {
     chrome.storage.sync.get({
         'platform': 'Gemini',
@@ -223,30 +242,39 @@ function loadSettings() {
         'cloudflareId': '',
         'cloudflareApiKey': ''
     }, function(items) {
+        console.log('Loaded settings:', items);
         document.getElementById('platform').value = items.platform;
+        
         populateModelDropdown(items.platform);
         
-        // Wait for dropdown to be populated before setting the value
+        // Set the model value after a short delay to ensure the dropdown has been populated
         setTimeout(() => {
-            document.getElementById('model').value = items.model || 'gemini-1.5-flash';
-            document.getElementById('use-specific-model').checked = items.useSpecificModel;
-            document.getElementById('custom-model').value = items.custom_model;
-            document.getElementById('gemini-api-key').value = items.geminiApiKey;
-            document.getElementById('openrouter-api-key').value = items.openrouterApiKey;
-            document.getElementById('cloudflare-id').value = items.cloudflareId;
-            document.getElementById('cloudflare-api-key').value = items.cloudflareApiKey;
-            toggleModelSelection();
+            setModelValue(items.model);
         }, 0);
+        
+        document.getElementById('use-specific-model').checked = items.useSpecificModel;
+        document.getElementById('custom-model').value = items.custom_model;
+        document.getElementById('gemini-api-key').value = items.geminiApiKey;
+        document.getElementById('openrouter-api-key').value = items.openrouterApiKey;
+        document.getElementById('cloudflare-id').value = items.cloudflareId;
+        document.getElementById('cloudflare-api-key').value = items.cloudflareApiKey;
+        
+        toggleModelSelection();
     });
 }
-
 function saveSettings() {
+    const platform = document.getElementById('platform').value;
+    const model = document.getElementById('model').value;
+    const useSpecificModel = document.getElementById('use-specific-model').checked;
+    const customModel = document.getElementById('custom-model').value;
+
     chrome.storage.sync.set({
-        platform: document.getElementById('platform').value,
-        model: document.getElementById('model').value,
-        useSpecificModel: document.getElementById('use-specific-model').checked,
-        custom_model: document.getElementById('custom-model').value
+        platform: platform,
+        model: model,
+        useSpecificModel: useSpecificModel,
+        custom_model: customModel
     }, function() {
+        console.log('Saved settings:', { platform, model, useSpecificModel, custom_model: customModel });
         buttonStatus('Settings saved!', 'success');
     });
 }
