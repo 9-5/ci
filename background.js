@@ -135,32 +135,6 @@ const apiHandlers = {
                 throw new Error('No valid response from OpenRouter API');
             }
         }
-    },
-    cloudflare: {
-        makeApiCall: async (systemPrompt, prePrompt, textInput, apiKey, accountId, model) => {
-            const requestBody = {
-                messages: [
-                    { role: "system", content: systemPrompt },
-                    { role: "user", content: `${prePrompt}${textInput}` }
-                ]
-            };
-
-            const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/ai/run/${model}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${apiKey}`
-                },
-                body: JSON.stringify(requestBody)
-            });
-            const data = await response.json();
-            console.log('API Response:', data.success);
-            if (data.success && data.result && data.result.response) {
-                return data.result.response;
-            } else {
-                throw new Error('No valid response from Cloudflare API');
-            }
-        }
     }
 };
 

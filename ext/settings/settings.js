@@ -306,6 +306,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    const toggleGeminiButton = document.getElementById('toggle-gemini');
+    if (toggleGeminiButton) {
+        toggleGeminiButton.addEventListener('click', function() {
+            toggleVisibility('gemini-api-key', 'toggle-gemini');
+        });
+    }
+
+    const toggleOpenRouter = document.getElementById('toggle-openrouter');
+    if (toggleOpenRouter) {
+        toggleOpenRouter.addEventListener('click', function() {
+            toggleVisibility('openrouter-api-key', 'toggle-openrouter');
+        });
+    }
+
+    const toggleCloudflareID = document.getElementById('toggle-cloudflare-id');
+    if (toggleCloudflareID) {
+        toggleCloudflareID.addEventListener('click', function() {
+            toggleVisibility('cloudflare-id', 'toggle-cloudflare-id');
+        });
+    }
+
+    const toggleCloudflareKey = document.getElementById('toggle-cloudflare-api-key');
+    if (toggleCloudflareKey) {
+        toggleCloudflareKey.addEventListener('click', function() {
+            toggleVisibility('cloudflare-api-key', 'toggle-cloudflare-api-key');
+        });
+    }
+
+
     const platformSelect = document.getElementById('platform');
     if (platformSelect) {
         platformSelect.addEventListener('change', handlePlatformChange);
